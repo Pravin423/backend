@@ -1,12 +1,15 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 const userModel = require('../models/userModel');
 
 async function login(req, res){
   const { email, password } = req.body;
   if(!email || !password) return res.status(400).json({error:'email and password required'});
+
   const user = await userModel.findByEmail(email);
+  console.log("🔍 Login attempt for:", email, "Found user:", user);
   if(!user) return res.status(401).json({error:'Invalid credentials'});
+
   const ok = await bcrypt.compare(password, user.password_hash);
   if(!ok) return res.status(401).json({error:'Invalid credentials'});
 
